@@ -1,5 +1,5 @@
 /**  FFT using Cooley–Tukey FFT algorithm
- * 
+ *  F_k = F_k_even + W_k * F_k_odd
  */ 
 
 #include <stdio.h>
@@ -62,7 +62,7 @@ void comp_mul_self(Complex *c1, Complex *c2) {
     c1->b = c1->b * c2->a + c1a * c2->b;
 }
 
-void fft(const Complex *in, Complex *out, int step, int n) {
+void resursive_fft(const Complex *in, Complex *out, int step, int n) {
     int i;
     int half_n = n >> 1;
     const double PI = acos(-1);
@@ -73,8 +73,8 @@ void fft(const Complex *in, Complex *out, int step, int n) {
     if (!half_n) {
         *out = *in;
     } else {
-        fft(in, out, step << 1, half_n);
-        fft(in + step, out + half_n, step << 1, half_n);
+        resursive_fft(in, out, step << 1, half_n);
+        resursive_fft(in + step, out + half_n, step << 1, half_n);
         ei_ptr->a = 1;
         ei_ptr->b = 0;
         for (i = 0; i < half_n; i++) {
@@ -92,6 +92,61 @@ void fft(const Complex *in, Complex *out, int step, int n) {
 
 }
 
+unsigned int bit_reverse(unsigned int num, unsigned int bits);
+void bit_reverse_array(Complex *in, Complex *out, int n);
+
+void iterative_fft(Complex *in, Complex *out, int n) {
+    int i, s, j, k;
+    const double PI = acos(-1);
+    bit_reverse_array(in, out, n);
+    Complex ei;
+    Complex *ei_ptr = &ei;
+    for (s = 1; s < log2(n) + 1; s++) {
+        int m = 1 << s;
+        int m2 = m >> 1;
+        Complex ep = comp_euler(-PI / (double)m2);
+        Complex *ep_ptr = &ep; 
+        ei_ptr->a = 1;
+        ei_ptr->b = 0;
+        for (j = 0; j < m2; j++) {
+            for (k = j; k < n; k += m) {
+                Complex t = comp_mul(ei, out[k + m2]);
+                Complex u = out[k];
+                Complex *even_ptr = out + k;
+                Complex *odd_ptr = out + k + m2;
+                even_ptr->a = u.a + t.a;
+                even_ptr->b = u.b + t.b;
+                odd_ptr->a = u.a - t.a;
+                odd_ptr->b = u.b - t.b;
+            }
+            comp_mul_self(ei_ptr, ep_ptr);
+        }
+    }
+}
+
+void bit_reverse_array(Complex *in, Complex *out, int n) {
+    unsigned int i;
+    unsigned int bits = log2(n);
+    for (i = 0; i < n; i++) {
+        int reversed_i = bit_reverse(i, bits);
+        Complex *out_ptr = out + reversed_i;
+        Complex *in_ptr = in + i;
+        out_ptr->a = in_ptr->a;
+        out_ptr->b = in_ptr->b;
+    }
+}
+
+unsigned int bit_reverse(unsigned int num, unsigned int bits) {
+    unsigned int reversed_num = 0;
+    unsigned int i;
+    for (i = 0; i < bits; i++) {
+        reversed_num <<= 1;
+        reversed_num |= (num & 1);
+        num >>= 1;
+    }
+    return reversed_num;
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 2) {
         return 0;
@@ -103,14 +158,15 @@ int main(int argc, char *argv[]) {
     in = (Complex *) malloc(sizeof(Complex) * (size_t)n);
     out = (Complex *) malloc(sizeof(Complex) * (size_t)n);
     for (i = 0; i < n; i++) {
-        in[i].a = rand() % 10;
+        in[i].a = rand() % n;
         in[i].b = 0;
     }
     puts("#### Original Signal ####");
     for (i = 0; i < n; i++) {
         comp_print(in[i]);
     }
-    fft(in ,out, 1, n);
+    resursive_fft(in ,out, 1, n);
+    // iterative_fft(in, out, n);
     puts("#### Fourier Transform Result ####");
     for (i = 0; i < n; i++) {
         comp_print(out[i]);
