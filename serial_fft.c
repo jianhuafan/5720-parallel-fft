@@ -1,5 +1,5 @@
 /**  FFT using Cooley–Tukey FFT algorithm
- *  F_k = F_k_even + W_k * F_k_odd
+ *  flag: -n size of sequence, r resursive, i iterative
  */ 
 
 #include <stdio.h>
@@ -148,12 +148,13 @@ unsigned int bit_reverse(unsigned int num, unsigned int bits) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 2) {
+    if (argc != 3) {
         return 0;
     }
     int n;
     int i;
     n = atoi(argv[1]);
+    char mode = *argv[2];
     Complex *in, *out;
     in = (Complex *) malloc(sizeof(Complex) * (size_t)n);
     out = (Complex *) malloc(sizeof(Complex) * (size_t)n);
@@ -165,9 +166,16 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < n; i++) {
         comp_print(in[i]);
     }
-    resursive_fft(in ,out, 1, n);
-    // iterative_fft(in, out, n);
-    puts("#### Fourier Transform Result ####");
+    if (mode == 'r') {
+        resursive_fft(in ,out, 1, n);
+        puts("#### Recursive Fourier Transform Result ####");
+    } else if (mode == 'i') {
+        iterative_fft(in, out, n);
+        puts("#### Iterative Fourier Transform Result ####");
+    } else {
+        puts("please specify the mode to run fft, r means recursive, i means iterative!");
+        return 0;
+    }
     for (i = 0; i < n; i++) {
         comp_print(out[i]);
     }
