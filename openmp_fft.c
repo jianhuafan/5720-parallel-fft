@@ -178,6 +178,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             step *= 2;
             a /= 2;
         }
+        printf("j: %d\n", j);
     }
 }
 
