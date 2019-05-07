@@ -147,6 +147,7 @@ void init_w_table(Complex *W, int n) {
             }
         }
     }
+    printf("hhhhhhhhhh\n");
 }
 
 void openmp_fft(Complex *in, Complex *out, int n) {
