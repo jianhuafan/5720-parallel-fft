@@ -163,12 +163,6 @@ void openmp_fft(Complex *in, Complex *out, int n) {
     for (j = 0; j < size; j++) {
         #pragma omp parallel shared(j, in, out, W, step, a, n) private(i)
         {
-            int tid, nthreads;
-            tid = omp_get_thread_num();
-            if (tid == 0) {
-                nthreads = omp_get_num_threads(); 
-                printf("Number of threads = %d\n", nthreads);
-            }
             #pragma omp for
             for (i = 0; i < n; i++) {
                 if (!(i & step)) {
