@@ -150,15 +150,15 @@ void init_w_table(Complex *W, int n) {
 }
 
 void openmp_fft(Complex *in, Complex *out, int n) {
-    int step = 1, i;
-    int a = n / 2;
-    int j;
+    unsigned long step = 1, i;
+    unsigned long a = n / 2;
+    unsigned long j;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
     Complex *W;
     W = (Complex *) malloc(sizeof(Complex) * (size_t)a);
     init_w_table(W, n);
-    int size = log2(n);
+    unsigned long size = log2(n);
     for (j = 0; j < size; j++) {
         #pragma omp parallel shared(in, out, W, step, a, n) private(i)
         {
@@ -166,8 +166,8 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             for (i = 0; i < n; i++) {
                 if (!(i & step)) {
                     Complex u = out[i];
-                    printf("i + step: %d\n", i + step);
-                    printf("W[idx]: %d\n", (i * a) % (step * a));
+                    printf("i + step: %ul\n", i + step);
+                    printf("W[idx]: %ul\n", (i * a) % (step * a));
                     Complex t = comp_mul(W[(i * a) % (step * a)], out[i + step]);
                     Complex *even_ptr = out + i;
                     Complex *odd_ptr = out + i + step;
@@ -180,7 +180,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             step *= 2;
             a /= 2;
         }
-        printf("j: %d\n", j);
+        printf("j: %ul\n", j);
     }
 }
 
