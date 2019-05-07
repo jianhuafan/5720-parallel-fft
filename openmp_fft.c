@@ -133,7 +133,8 @@ void iterative_fft(Complex *in, Complex *out, int n) {
 
 void init_w_table(Complex *W, int n) {
     int i;
-    W[0] = 1;
+    const double PI = acos(-1);
+    W[0] = comp_create(1, 0);
     W[1] = comp_euler(-PI / (double)(n / 2));
     #pragma omp parallel shared ( W ) private ( i )
     {
@@ -142,7 +143,7 @@ void init_w_table(Complex *W, int n) {
             W[i] = comp_create(1, 0);
             int j;
             for (j = 0; j < i; j++) {
-                comp_mul_self(W[i], W[1]);
+                comp_mul_self(&W[i], &W[1]);
             }
         }
     }
@@ -165,7 +166,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             for (i = 0; i < n; i++) {
                 if (!(i & step)) {
                     Complex u = out[i];
-                    Complex t = W[(i * a) % (step * a)]* out[i + n];
+                    Complex t = comp_mul(W[(i * a) % (step * a)], out[i + n]);
 
                     Complex *even_ptr = out + i;
                     Complex *odd_ptr = out + i + step;
