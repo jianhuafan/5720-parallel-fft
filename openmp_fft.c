@@ -147,7 +147,6 @@ void init_w_table(Complex *W, int n) {
             }
         }
     }
-    printf("hhhhhhhhhh\n");
 }
 
 void openmp_fft(Complex *in, Complex *out, int n) {
@@ -160,6 +159,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
     W = (Complex *) malloc(sizeof(Complex) * (size_t)a);
     init_w_table(W, n);
     int size = log2(n);
+    printf("hhhhh\n");
     for (j = 0; j < size; j++) {
         #pragma omp parallel shared(in, out, W, step, a, n) private(i)
         {
