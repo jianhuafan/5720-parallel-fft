@@ -153,7 +153,6 @@ void openmp_fft(Complex *in, Complex *out, int n) {
     unsigned long step = 1;
     unsigned long i;
     unsigned long a = n / 2;
-    unsigned long j;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
     Complex *W;
@@ -161,7 +160,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
     init_w_table(W, n);
     printf("n: %d\n", n);
     unsigned long size = log2(n);
-    for (j = 0; j < size; j++) {
+    for (unsigned long j = 0; j < size; j++) {
         #pragma omp parallel shared(in, out, W, step, a, n) private(i)
         {
             #pragma omp for
