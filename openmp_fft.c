@@ -166,7 +166,7 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             for (i = 0; i < n; i++) {
                 if (!(i & step)) {
                     Complex u = out[i];
-                    Complex t = comp_mul(W[(i * a) % (step * a)], out[i + n]);
+                    Complex t = comp_mul(W[(i * a) % (step * a)], out[i + step]);
                     Complex *even_ptr = out + i;
                     Complex *odd_ptr = out + i + step;
                     even_ptr->a = u.a + t.a;
@@ -178,7 +178,6 @@ void openmp_fft(Complex *in, Complex *out, int n) {
             step <<= 1;
             a >>= 1;
         }
-        printf("%d\n", j);
     }
 }
 
