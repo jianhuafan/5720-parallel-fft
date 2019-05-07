@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <limits.h>
+#include <sys/times.h>
+#include <sys/types.h>
 #include <omp.h>
 
 typedef struct Complex {
@@ -97,6 +101,35 @@ unsigned int bit_reverse(unsigned int num, unsigned int bits);
 void bit_reverse_array(Complex *in, Complex *out, int n);
 
 void iterative_fft(Complex *in, Complex *out, int n) {
+    int i, s, j, k;
+    const double PI = acos(-1);
+    bit_reverse_array(in, out, n);
+    Complex ei;
+    Complex *ei_ptr = &ei;
+    for (s = 1; s < log2(n) + 1; s++) {
+        int m = 1 << s;
+        int m2 = m >> 1;
+        Complex ep = comp_euler(-PI / (double)m2);
+        Complex *ep_ptr = &ep; 
+        ei_ptr->a = 1;
+        ei_ptr->b = 0;
+        for (j = 0; j < m2; j++) {
+            for (k = j; k < n; k += m) {
+                Complex t = comp_mul(ei, out[k + m2]);
+                Complex u = out[k];
+                Complex *even_ptr = out + k;
+                Complex *odd_ptr = out + k + m2;
+                even_ptr->a = u.a + t.a;
+                even_ptr->b = u.b + t.b;
+                odd_ptr->a = u.a - t.a;
+                odd_ptr->b = u.b - t.b;
+            }
+            comp_mul_self(ei_ptr, ep_ptr);
+        }
+    }
+}
+
+void openmp_fft(Complex *in, Complex *out, int n) {
     int s, j, k;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
@@ -172,17 +205,27 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < n; i++) {
         comp_print(in[i]);
     }
+    struct timespec start, end;
+    long long unsigned int diff;
+    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
     if (mode == 'r') {
         resursive_fft(in ,out, 1, n);
         puts("#### Recursive Fourier Transform Result ####");
     } else if (mode == 'i') {
         iterative_fft(in, out, n);
         puts("#### Iterative Fourier Transform Result ####");
-    } else {
+    } else if (mode == 'o') {
+        openmp_fft(in, out, n);
+        puts("#### Openmp Fourier Transform Result ####");
+    }
+    else {
         puts("please specify the mode to run fft, r means recursive, i means iterative!");
         return 0;
     }
-    for (i = 0; i < n; i++) {
-        comp_print(out[i]);
-    }
+    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
+    diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+	printf("elapsed time = %llu milliseconds\n", (long long unsigned int) (diff / 1000000));
+    // for (i = 0; i < n; i++) {
+    //     comp_print(out[i]);
+    // }
 }
