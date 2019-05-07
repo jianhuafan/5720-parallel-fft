@@ -6,6 +6,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <limits.h>
+#include <sys/times.h>
+#include <sys/types.h>
 
 typedef struct Complex {
     // a + bi
@@ -166,6 +170,9 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < n; i++) {
         comp_print(in[i]);
     }
+    struct timespec start, end;
+    long long unsigned int diff;
+    clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
     if (mode == 'r') {
         resursive_fft(in ,out, 1, n);
         puts("#### Recursive Fourier Transform Result ####");
@@ -176,7 +183,10 @@ int main(int argc, char *argv[]) {
         puts("please specify the mode to run fft, r means recursive, i means iterative!");
         return 0;
     }
-    for (i = 0; i < n; i++) {
-        comp_print(out[i]);
-    }
+    clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
+    diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+	printf("elapsed time = %llu us\n", (long long unsigned int) (diff / 1000));
+    // for (i = 0; i < n; i++) {
+    //     comp_print(out[i]);
+    // }
 }

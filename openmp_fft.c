@@ -132,11 +132,12 @@ void iterative_fft(Complex *in, Complex *out, int n) {
 }
 
 void openmp_fft(Complex *in, Complex *out, int n) {
-    int s, j, k;
+    int step = 1, i;
+    int a = n / 2;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
     int size = log2(n) + 1;
-    #pragma omp parallel shared(size) private(s, j, k)
+    #pragma omp parallel shared(in, out, n, ) private(s, j, k)
     {
         #pragma omp for
         for (s = 1; s < size; s++) {
