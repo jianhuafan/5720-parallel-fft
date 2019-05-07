@@ -6,6 +6,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include <complex.h>
 
 typedef struct Complex {
     // a + bi
