@@ -131,37 +131,52 @@ void iterative_fft(Complex *in, Complex *out, int n) {
     }
 }
 
+void init_w_table(Complex *W, int n) {
+    int i;
+    W[0] = 1;
+    W[1] = comp_euler(-PI / (double)(n / 2));
+    #pragma omp parallel shared ( W ) private ( i )
+    {
+        #pragma omp for nowait
+        for (i = 2; i < n / 2; i++) {
+            W[i] = comp_create(1, 0);
+            int j;
+            for (j = 0; j < i; j++) {
+                comp_mul_self(W[i], W[1]);
+            }
+        }
+    }
+}
+
 void openmp_fft(Complex *in, Complex *out, int n) {
     int step = 1, i;
     int a = n / 2;
+    int j;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
-    int size = log2(n) + 1;
-    #pragma omp parallel shared(in, out, n, ) private(s, j, k)
-    {
-        #pragma omp for
-        for (s = 1; s < size; s++) {
-            int m = 1 << s;
-            int m2 = m >> 1;
-            Complex ei;
-            Complex *ei_ptr = &ei;
-            Complex ep = comp_euler(-PI / (double)m2);
-            Complex *ep_ptr = &ep; 
-            ei_ptr->a = 1;
-            ei_ptr->b = 0;
-            for (j = 0; j < m2; j++) {
-                for (k = j; k < n; k += m) {
-                    Complex t = comp_mul(ei, out[k + m2]);
-                    Complex u = out[k];
-                    Complex *even_ptr = out + k;
-                    Complex *odd_ptr = out + k + m2;
+    Complex *W;
+    W = (Complex *) malloc(sizeof(Complex) * (size_t)a);
+    init_w_table(W, n);
+    int size = log2(n);
+    for (j = 0; j < size; j++) {
+        #pragma omp parallel shared(in, out, W, step, a, n) private(i)
+        {
+            #pragma omp for
+            for (i = 0; i < n; i++) {
+                if (!(i & step)) {
+                    Complex u = out[i];
+                    Complex t = W[(i * a) % (step * a)]* out[i + n];
+
+                    Complex *even_ptr = out + i;
+                    Complex *odd_ptr = out + i + step;
                     even_ptr->a = u.a + t.a;
                     even_ptr->b = u.b + t.b;
                     odd_ptr->a = u.a - t.a;
                     odd_ptr->b = u.b - t.b;
                 }
-                comp_mul_self(ei_ptr, ep_ptr);
             }
+            step <<= 1;
+            a >>= 1;
         }
     }
 }
@@ -169,12 +184,16 @@ void openmp_fft(Complex *in, Complex *out, int n) {
 void bit_reverse_array(Complex *in, Complex *out, int n) {
     unsigned int i;
     unsigned int bits = log2(n);
-    for (i = 0; i < n; i++) {
-        int reversed_i = bit_reverse(i, bits);
-        Complex *out_ptr = out + reversed_i;
-        Complex *in_ptr = in + i;
-        out_ptr->a = in_ptr->a;
-        out_ptr->b = in_ptr->b;
+    #pragma omp parallel shared ( in, out, n, bits ) private ( i )
+    {
+        #pragma omp for nowait
+        for (i = 0; i < n; i++) {
+            int reversed_i = bit_reverse(i, bits);
+            Complex *out_ptr = out + reversed_i;
+            Complex *in_ptr = in + i;
+            out_ptr->a = in_ptr->a;
+            out_ptr->b = in_ptr->b;
+        }
     }
 }
 
