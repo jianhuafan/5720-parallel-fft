@@ -2,6 +2,8 @@
     "files.associations": {
         "cmath": "c",
         "complex": "c",
-        "complex.h": "c"
+        "complex.h": "c",
+        "initializer_list": "c",
+        "string_view": "c"
     }
 }

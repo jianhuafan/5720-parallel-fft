@@ -100,11 +100,11 @@ void iterative_fft(Complex *in, Complex *out, int n) {
     int s, j, k;
     const double PI = acos(-1);
     bit_reverse_array(in, out, n);
-    int 
-    #pragma omp parallel private(s, j, k)
+    int size = log2(n) + 1;
+    #pragma omp parallel shared(size) private(s, j, k)
     {
         #pragma omp for
-        for (s = 1; s < log2(n) + 1; s++) {
+        for (s = 1; s < size; s++) {
             int m = 1 << s;
             int m2 = m >> 1;
             Complex ei;
