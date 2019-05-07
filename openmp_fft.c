@@ -175,8 +175,8 @@ void openmp_fft(Complex *in, Complex *out, int n) {
                     odd_ptr->b = u.b - t.b;
                 }
             }
-            step <<= 1;
-            a >>= 1;
+            step *= 2;
+            a /= 2;
         }
     }
 }
