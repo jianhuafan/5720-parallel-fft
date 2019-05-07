@@ -244,6 +244,7 @@ int main(int argc, char *argv[]) {
         iterative_fft(in, out, n);
         puts("#### Iterative Fourier Transform Result ####");
     } else if (mode == 'o') {
+        omp_set_num_threads(8);
         openmp_fft(in, out, n);
         puts("#### Openmp Fourier Transform Result ####");
     }
