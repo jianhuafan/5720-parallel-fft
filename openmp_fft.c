@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <omp.h>
 
+#define BILLION 1000000000L
+
 typedef struct Complex {
     // a + bi
     double a;
