@@ -182,9 +182,9 @@ void openmp_fft(Complex *in, Complex *out, int n) {
                     odd_ptr->b = u.b - t.b;
                 }
             }
-            step *= 2;
-            a = a / 2;
         }
+        step = step * 2;
+        a = a / 2;
         printf("j: %lu\n", j);
     }
 }
