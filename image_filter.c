@@ -16,7 +16,7 @@ int main() {
     int i, j;
     for (i = 0; i < 10; i++) {
         for (j = 0; j < 10; j++) {
-            printf("%hhu\n", rgb_image[i][j]);
+            printf("%hhu\n", rgb_image[i]);
         }
         printf("\n");
     }
