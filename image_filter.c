@@ -1,11 +1,7 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
-#include <cufft.h>
-#include "cuda.h"
-#include "device_launch_parameters.h"
-#include "cuda_runtime.h"
-#include "stdio.h"
+#include "/usr/local/cuda-10.0/lib64/cufft.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
