@@ -13,15 +13,17 @@ int main() {
     printf("height: %d\n", height);
     printf("bpp: %d\n", bpp);
 
-    printf("%lu\n", sizeof(rgb_image[0]));
+    int i, j;
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
+            uint8_t* pixel = rgb_image + (i * width + j) * bpp;
+            printf("r: %hhu ", pixel[0]);
+            printf("g: %hhu ", pixel[1]);
+            printf("b: %hhu\n", pixel[2]);
+        }
+        printf("\n");
+    }
 
-    // int i, j;
-    // for (i = 0; i < height; i++) {
-    //     for (j = 0; j < width; j++) {
-    //         printf("%hhu\n", rgb_image[i * width + j]);
-    //     }
-    //     printf("\n");
-    // }
     stbi_image_free(rgb_image);
 
     return 0;
