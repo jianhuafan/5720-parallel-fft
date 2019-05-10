@@ -13,7 +13,7 @@ int main() {
     printf("height: %d\n", height);
     printf("bpp: %d\n", bpp);
 
-    printf("%ul\n", sizeof(rgb_image[0]));
+    printf("%i\n", sizeof(rgb_image[0]));
 
     // int i, j;
     // for (i = 0; i < height; i++) {
