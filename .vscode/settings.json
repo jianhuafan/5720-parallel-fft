@@ -4,6 +4,7 @@
         "complex": "c",
         "complex.h": "c",
         "initializer_list": "c",
-        "string_view": "c"
+        "string_view": "c",
+        "stdint.h": "c"
     }
 }
