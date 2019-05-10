@@ -7,7 +7,7 @@
 
 int main() {
     int width, height, bpp;
-    unit8_int* rgb_image = stbi_load("image/dog.jpg", &width, &height, &bpp, 3);
+    uint8_t* rgb_image = stbi_load("image/dog.jpg", &width, &height, &bpp, 3);
 
     printf("width: %d\n", width);
     printf("height: %d\n", height);
