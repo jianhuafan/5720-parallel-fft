@@ -18,7 +18,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define FILTER_KERNEL_SIZE 11
+#define FILTER_KERNEL_SIZE 9
 
 __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
     const int numThreads = blockDim.x * gridDim.x;
@@ -87,8 +87,11 @@ int main(int argc, char **argv) {
 
     // feed kernel
     for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
-        filter_kernel[i].x = rand() / (float) RAND_MAX;
+        filter_kernel[i].x = 0.0;
         filter_kernel[i].y = 0.0;
+        if (i == FILTER_KERNEL_SIZE / 2) {
+            filter_kernel[i].x = 1.0;
+        }
     }
 
     // pad image and filter kernel
