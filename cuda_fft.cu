@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
     // pad image and filter kernel
     cufftComplex *padded_signal;
     cufftComplex *padded_filter_kernel;
-    int new_size = PadData(signal, &padded_signal, signal_size, filter_kernel,
+    int new_size = PadData(signal, &padded_signal, width * height, filter_kernel,
               &padded_filter_kernel, FILTER_KERNEL_SIZE);
     
     int mem_size = sizeof(cufftComplex) * new_size;
