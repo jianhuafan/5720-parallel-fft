@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_data, host_data, N*N * sizeof(cufftComplex), cudaMemcpyHostToDevice);
     
     // create cufft plan
-    cufftPlan2d(&plan, N, N, CUFFT_C2C, 1);
+    cufftPlan2d(&plan, N, N, CUFFT_C2C);
 
     // perform computation
     cufftExecC2C(plan, dev_data, dev_data, CUFFT_FORWARD);
