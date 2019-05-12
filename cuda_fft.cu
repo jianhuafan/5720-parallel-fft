@@ -40,7 +40,7 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_data, host_data, DIM * sizeof(cufftComplex), cudaMemcpyHostToDevice);
     
     // create cufft plan
-    cufftPlan1d(&plan, DIM, CUFFT_C22, 1);
+    cufftPlan1d(&plan, DIM, CUFFT_C2C, 1);
 
     // perform computation
     cufftExecC2C(plan, dev_data, dev_data, CUFFT_FORWARD);
@@ -55,13 +55,13 @@ int main(int argc, char **argv) {
 
     // show results
     for (int i = 0; i < 16; i++) {
-        printf("DATA: %3.1f %3.1f \ n", host_data[i].x, host_data[i].y);
+        printf("DATA: %3.1f %3.1f \n", host_data[i].x, host_data[i].y);
     }
 
     // free memory
     cufftDestroy(plan);
     cudaFree(dev_data);
     free(host_data);
-    
+
     return 0;
 }
