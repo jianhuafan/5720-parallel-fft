@@ -49,8 +49,7 @@ int main(int argc, char **argv) {
     srand(time(NULL));
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            uint8_t* pixel = rgb_image + (i * width + j) * bpp;
-            printf("%hhu\n", pixel[0]);
+            uint8_t* pixel = rgb_image + (i * width + j);
             signal[i * width + j].x = (float)pixel[0];
             signal[i * width + j].y = 0.0;
         }
