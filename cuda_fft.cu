@@ -10,5 +10,6 @@
 typedef float2 Complex;
 
 int main(int argc, char **argv) {
+    printf("cufft lib is usable");
     return 0;
 }
