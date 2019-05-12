@@ -38,6 +38,30 @@ int main(int argc, char **argv) {
 
     // copy input to device
     cudaMemcpy(dev_data, host_data, DIM * sizeof(cufftComplex), cudaMemcpyHostToDevice);
-    printf("test done!\n");
+    
+    // create cufft plan
+    cufftPlan1d(&plan, DIM, CUFFT_C22, 1);
+
+    // perform computation
+    cufftExecC2C(plan, dev_data, dev_data, CUFFT_FORWARD);
+
+    // copy back results
+    cudaMemcpy(host_data, dev_data, sizeof(cufftComplex) * DIM, cudaMemcpyDeviceToHost);
+
+    // get calculation time
+    cudaEventRecord(stop, 0);
+    cudaEventSynchronize(stop);
+    cudaEventElapsedTime(&elapsedTime, start, stop);
+
+    // show results
+    for (int i = 0; i < 16; i++) {
+        printf("DATA: %3.1f %3.1f \ n", host_data[i].x, host_data[i].y);
+    }
+
+    // free memory
+    cufftDestroy(plan);
+    cudaFree(dev_data);
+    free(host_data);
+    
     return 0;
 }
