@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
-#include "/usr/local/cuda-10.0/lib64/cufft.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
