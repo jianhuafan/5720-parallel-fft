@@ -27,10 +27,8 @@ __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
         cufftComplex c;
         c.x = a[i].x * b[i].x - a[i].y*b[i].y;
         c.y = a[i].x * b[i].y + a[i].y*b[i].x;
-        printf("%5.3f %5.3f", c.x, c.y);
-        c.x /= (1.0f / size);
-        c.y /= (1.0f / size);
-        printf("%5.3f %5.3f", c.x, c.y);
+        c.x /= size;
+        c.y /= size;
         a[i] = c;
     }
 }
