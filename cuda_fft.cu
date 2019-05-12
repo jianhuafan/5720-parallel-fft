@@ -43,7 +43,7 @@ int PadData(const cufftComplex *signal, cufftComplex **padded_signal, int signal
 
   // Pad signal
   cufftComplex *new_data =(cufftComplex *)(malloc(sizeof(cufftComplex) * new_size));
-  memcpy(new_data + 0, signal, signal_size * sizeof(Complex));
+  memcpy(new_data + 0, signal, signal_size * sizeof(cufftComplex));
   memset(new_data + signal_size, 0, (new_size - signal_size) * sizeof(cufftComplex));
   *padded_signal = new_data;
 
@@ -97,7 +97,7 @@ int main(int argc, char **argv) {
     int new_size = PadData(signal, &padded_signal, signal_size, filter_kernel,
               &padded_filter_kernel, FILTER_KERNEL_SIZE);
     
-    int mem_size = sizeof(Complex) * new_size;
+    int mem_size = sizeof(cufftComplex) * new_size;
 
     // allocate gpu memory
     cudaMalloc((void**)&dev_signal, mem_size);
