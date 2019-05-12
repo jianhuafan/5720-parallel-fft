@@ -58,6 +58,8 @@ int main(int argc, char **argv) {
         filter_kernel[i].x = rand() / (float) RAND_MAX;
         filter_kernel[i].y = 0.0;
     }
+    
+    printf("aaaa\n");
 
     // allocate gpu memory
     cudaMalloc((void**)&dev_signal, mem_size);
@@ -77,6 +79,8 @@ int main(int argc, char **argv) {
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_FORWARD);
     cufftExecC2C(plan, dev_filter_kernel, dev_filter_kernel, CUFFT_FORWARD);
 
+    printf("bbbb\n");
+
     // perform multiplication
     ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, width * height);
 
@@ -91,6 +95,8 @@ int main(int argc, char **argv) {
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&elapsedTime, start, stop);
 
+    printf("cccc\n");
+
     // show results
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -98,6 +104,8 @@ int main(int argc, char **argv) {
         }
     }
     printf("CUFFT calculation completed: %5.3f ms\n", elapsedTime);
+
+    printf("dddd\n");
 
     // write filtered image
     uint8_t* output_rgb_image;
@@ -107,7 +115,12 @@ int main(int argc, char **argv) {
             output_rgb_image[i * width + j] = (uint8_t)signal[i * width + j].x;
         }
     }
+
+    printf("eeee\n");
+
     stbi_write_png("image/filtered_dog.png", width, height, 1, output_rgb_image, width);
+
+    printf("fffff\n");
 
     // free memory
     cufftDestroy(plan);
