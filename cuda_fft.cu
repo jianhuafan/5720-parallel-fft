@@ -35,9 +35,13 @@ int main(int argc, char **argv) {
     int width, height, bpp;
     uint8_t* rgb_image = stbi_load("image/dog.jpg", &width, &height, &bpp, STBI_grey);
 
+    printf("%d\n", width);
+
     float elapsedTime = 0;
     cufftHandle plan;
     int mem_size = width * height * sizeof(cufftComplex);
+
+    printf("%d\n", mem_size);
     cufftComplex *signal = (cufftComplex*)malloc(mem_size);
     cufftComplex *filter_kernel = (cufftComplex*)malloc(mem_size);
     cufftComplex *dev_signal;
@@ -53,6 +57,9 @@ int main(int argc, char **argv) {
             signal[i * width + j].y = 0.0;
         }
     }
+
+    printf("gggg\n");
+    
     // feed kernel
     for (int i = 0; i < height * width; i++) {
         filter_kernel[i].x = rand() / (float) RAND_MAX;
