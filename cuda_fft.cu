@@ -1,5 +1,3 @@
-// compile command: /usr/local/cuda-10.0/bin/nvcc -arch=compute_35 cuda_fft.cu -lcublas -lcufft
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -63,7 +61,7 @@ int main(int argc, char **argv) {
 
     // load image
     int width, height, bpp;
-    uint8_t* rgb_image = stbi_load("image/dog.jpg", &width, &height, &bpp, STBI_grey);
+    uint8_t* rgb_image = stbi_load("image/sheep.png", &width, &height, &bpp, STBI_grey);
 
     float elapsedTime = 0;
     cufftHandle plan;
@@ -155,7 +153,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("image/filtered_dog.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("image/filtered_sheep.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
