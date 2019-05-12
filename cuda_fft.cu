@@ -166,8 +166,7 @@ int main(int argc, char **argv) {
     output_rgb_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            uint8_t* orignal_pixel = rgb_image + (i * width + j);
-            output_rgb_image[i * width + j] = orignal_pixel[0];
+            output_rgb_image[i * width + j] = (uint8_t*)convolved_signal[i * width + j].x;
             if (i < 4 && j < 4) {
                 printf("%hhu\n", output_rgb_image[i * width + j]);
             }
