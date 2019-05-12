@@ -18,6 +18,8 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#define FILTER_KERNEL_SIZE 11
+
 __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
     const int numThreads = blockDim.x * gridDim.x;
     const int threadID = blockIdx.x * blockDim.x + threadIdx.x;
@@ -31,6 +33,32 @@ __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
     }
 }
 
+// Pad data
+int PadData(const cufftComplex *signal, cufftComplex **padded_signal, int signal_size,
+            const cufftComplex *filter_kernel, cufftComplex **padded_filter_kernel,
+            int filter_kernel_size) {
+  int minRadius = filter_kernel_size / 2;
+  int maxRadius = filter_kernel_size - minRadius;
+  int new_size = signal_size + maxRadius;
+
+  // Pad signal
+  cufftComplex *new_data =(cufftComplex *)(malloc(sizeof(cufftComplex) * new_size));
+  memcpy(new_data + 0, signal, signal_size * sizeof(Complex));
+  memset(new_data + signal_size, 0, (new_size - signal_size) * sizeof(cufftComplex));
+  *padded_signal = new_data;
+
+  // Pad filter
+  new_data = (cufftComplex *)(malloc(sizeof(cufftComplex) * new_size));
+  memcpy(new_data + 0, filter_kernel + minRadius, maxRadius * sizeof(cufftComplex));
+  memset(new_data + maxRadius, 0,
+         (new_size - filter_kernel_size) * sizeof(cufftComplex));
+  memcpy(new_data + new_size - minRadius, filter_kernel,
+         minRadius * sizeof(cufftComplex));
+  *padded_filter_kernel = new_data;
+
+  return new_size;
+}
+
 int main(int argc, char **argv) {
 
     // load image
@@ -39,10 +67,10 @@ int main(int argc, char **argv) {
 
     float elapsedTime = 0;
     cufftHandle plan;
-    int mem_size = width * height * sizeof(cufftComplex);
+    int signal_size = width * height * sizeof(cufftComplex);
 
-    cufftComplex *signal = (cufftComplex*)malloc(mem_size);
-    cufftComplex *filter_kernel = (cufftComplex*)malloc(mem_size);
+    cufftComplex *signal = (cufftComplex*)malloc(signal_size);
+    cufftComplex *filter_kernel = (cufftComplex*)malloc(FILTER_KERNEL_SIZE * sizeof(cufftComplex));
     cufftComplex *dev_signal;
     cufftComplex *dev_filter_kernel;
     cudaEvent_t start, stop;
@@ -58,10 +86,18 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    for (int i = 0; i < height * width; i++) {
+    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].x = rand() / (float) RAND_MAX;
         filter_kernel[i].y = 0.0;
     }
+
+    // pad image and filter kernel
+    cufftComplex *padded_signal;
+    cufftComplex *padded_filter_kernel;
+    int new_size = PadData(signal, &padded_signal, signal_size, filter_kernel,
+              &padded_filter_kernel, FILTER_KERNEL_SIZE);
+    
+    int mem_size = sizeof(Complex) * new_size;
 
     // allocate gpu memory
     cudaMalloc((void**)&dev_signal, mem_size);
@@ -70,9 +106,9 @@ int main(int argc, char **argv) {
     cudaEventCreate(&stop);
     cudaEventRecord(start, 0);
 
-    // copy input to device
-    cudaMemcpy(dev_signal, signal, mem_size, cudaMemcpyHostToDevice);
-    cudaMemcpy(dev_filter_kernel, filter_kernel, mem_size, cudaMemcpyHostToDevice);
+    // copy padded input to device
+    cudaMemcpy(dev_signal, padded_signal, mem_size, cudaMemcpyHostToDevice);
+    cudaMemcpy(dev_filter_kernel, padded_filter_kernel, mem_size, cudaMemcpyHostToDevice);
     
     // create cufft plan
     cufftPlan2d(&plan, height, width, CUFFT_C2C);
@@ -82,13 +118,14 @@ int main(int argc, char **argv) {
     cufftExecC2C(plan, dev_filter_kernel, dev_filter_kernel, CUFFT_FORWARD);
 
     // perform multiplication
-    ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, width * height);
+    ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, new_size);
 
     // perform inverse 2dfft
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_INVERSE);
 
     // copy back results
-    cudaMemcpy(signal, dev_signal, mem_size, cudaMemcpyDeviceToHost);
+    cufftComplex *convolved_signal = padded_signal;
+    cudaMemcpy(convolved_signal, dev_signal, mem_size, cudaMemcpyDeviceToHost);
 
     // get calculation time
     cudaEventRecord(stop, 0);
@@ -98,7 +135,7 @@ int main(int argc, char **argv) {
     // show results
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f \n", signal[i * 4 + j].x, signal[i * 4 + j].y);
+            printf("DATA: %3.1f %3.1f \n", convolved_signal[i * 4 + j].x, convolved_signal[i * 4 + j].y);
         }
     }
     printf("CUFFT calculation completed: %5.3f ms\n", elapsedTime);
@@ -108,7 +145,7 @@ int main(int argc, char **argv) {
     output_rgb_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            output_rgb_image[i * width + j] = (uint8_t)signal[i * width + j].x;
+            output_rgb_image[i * width + j] = (uint8_t)convolved_signal[i * width + j].x;
             if (i < 4 && j < 4) {
                 printf("%hhu\n", output_rgb_image[i * width + j]);
             }
