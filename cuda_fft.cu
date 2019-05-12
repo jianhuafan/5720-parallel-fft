@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     // feed input
     srand(time(NULL));
     for (int i = 0; i < N; i++) {
-        for (int j = 0; j < N; k++) {
+        for (int j = 0; j < N; j++) {
             host_data[i * N + j].x = rand() / (float) RAND_MAX;
             host_data[i * N + j].y = 0.0;
         }
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_data, host_data, N*N * sizeof(cufftComplex), cudaMemcpyHostToDevice);
     
     // create cufft plan
-    cufftPlan2D(&plan, N, N, CUFFT_C2C, 1);
+    cufftPlan2d(&plan, N, N, CUFFT_C2C, 1);
 
     // perform computation
     cufftExecC2C(plan, dev_data, dev_data, CUFFT_FORWARD);
