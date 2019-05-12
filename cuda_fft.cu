@@ -117,6 +117,13 @@ int main(int argc, char **argv) {
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_FORWARD);
     cufftExecC2C(plan, dev_filter_kernel, dev_filter_kernel, CUFFT_FORWARD);
 
+    // show results
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("IFFT SIGNAL DATA: %3.1f %3.1f \n", dev_signal[i * 4 + j].x, dev_signal[i * 4 + j].y);
+        }
+    }
+
     // perform multiplication
     ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, new_size);
 
