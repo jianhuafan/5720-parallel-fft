@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
     cudaMemcpy(dev_filter_kernel, filter_kernel, mem_size, cudaMemcpyHostToDevice);
     
     // create cufft plan
-    cufftPlan2d(&plan, N, N, CUFFT_C2C);
+    cufftPlan2d(&plan, height, width, CUFFT_C2C);
 
     // perform 2dfft
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_FORWARD);
@@ -103,10 +103,10 @@ int main(int argc, char **argv) {
 
     // write filtered image
     uint8_t* output_rgb_image;
-    output_rgb_image = malloc(width*height);
+    output_rgb_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            output_rgb_image[i * width + j] = (uint8_t)signal[i * width + j];
+            output_rgb_image[i * width + j] = (uint8_t)signal[i * width + j].x;
         }
     }
     stbi_write_png("image/filtered_dog.png", width, height, 1, output_rgb_image, width);
