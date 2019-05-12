@@ -25,6 +25,8 @@ __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
         cufftComplex c;
         c.x = a[i].x * b[i].x - a[i].y*b[i].y;
         c.y = a[i].x * b[i].y + a[i].y*b[i].x;
+        c.x /= (1.0f / size);
+        c.y /= (1.0f / size);
         a[i] = c;
     }
 }
@@ -55,15 +57,11 @@ int main(int argc, char **argv) {
         }
     }
 
-    printf("gggg\n");
-
     // feed kernel
     for (int i = 0; i < height * width; i++) {
         filter_kernel[i].x = rand() / (float) RAND_MAX;
         filter_kernel[i].y = 0.0;
     }
-    
-    printf("aaaa\n");
 
     // allocate gpu memory
     cudaMalloc((void**)&dev_signal, mem_size);
@@ -83,8 +81,6 @@ int main(int argc, char **argv) {
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_FORWARD);
     cufftExecC2C(plan, dev_filter_kernel, dev_filter_kernel, CUFFT_FORWARD);
 
-    printf("bbbb\n");
-
     // perform multiplication
     ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, width * height);
 
@@ -99,8 +95,6 @@ int main(int argc, char **argv) {
     cudaEventSynchronize(stop);
     cudaEventElapsedTime(&elapsedTime, start, stop);
 
-    printf("cccc\n");
-
     // show results
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
@@ -109,22 +103,19 @@ int main(int argc, char **argv) {
     }
     printf("CUFFT calculation completed: %5.3f ms\n", elapsedTime);
 
-    printf("dddd\n");
-
     // write filtered image
     uint8_t* output_rgb_image;
     output_rgb_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             output_rgb_image[i * width + j] = (uint8_t)signal[i * width + j].x;
+            if (i < 4 && j < 4) {
+                printf("%hhu\n", output_rgb_image[i * width + j]);
+            }
         }
     }
 
-    printf("eeee\n");
-
     stbi_write_png("image/filtered_dog.png", width, height, 1, output_rgb_image, width);
-
-    printf("fffff\n");
 
     // free memory
     cufftDestroy(plan);
