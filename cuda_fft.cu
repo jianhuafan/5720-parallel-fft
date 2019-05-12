@@ -163,7 +163,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("image/filtered_sheep.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("image/filtered_gaussian_sheep.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
