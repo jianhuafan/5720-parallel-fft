@@ -99,6 +99,13 @@ void feed_edge_detection_kernel(cufftComplex *filter_kernel, int filter_kernel_s
     filter_kernel[8].x = -1.0f;
 }
 
+void feed_box_blur_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
+    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+        filter_kernel[i].x = 1.0 / filter_kernel_size;
+        filter_kernel[i].y = 0.0;
+    }
+}
+
 int main(int argc, char **argv) {
 
     // load image
@@ -126,7 +133,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_edge_detection_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_box_blur_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
@@ -189,7 +196,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("image/filtered_edge_detection_sheep.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("image/filtered_box_blur_sheep.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
