@@ -57,6 +57,22 @@ int PadData(const cufftComplex *signal, cufftComplex **padded_signal, int signal
   return new_size;
 }
 
+void feed_gaussian_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
+    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+        filter_kernel[i].x = 0.0;
+        filter_kernel[i].y = 0.0;
+    }
+    filter_kernel[0].x = 1.0f / 16;
+    filter_kernel[1].x = 2.0f / 16;
+    filter_kernel[2].x = 1.0f / 16;
+    filter_kernel[3].x = 2.0f / 16;
+    filter_kernel[4].x = 4.0f / 16;
+    filter_kernel[5].x = 2.0f / 16;
+    filter_kernel[6].x = 1.0f / 16;
+    filter_kernel[7].x = 2.0f / 16;
+    filter_kernel[8].x = 1.0f / 16;
+}
+
 int main(int argc, char **argv) {
 
     // load image
@@ -84,13 +100,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
-        filter_kernel[i].x = 0.0;
-        filter_kernel[i].y = 0.0;
-        if (i == FILTER_KERNEL_SIZE / 2) {
-            filter_kernel[i].x = 1.0;
-        }
-    }
+    feed_gaussian_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
