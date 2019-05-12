@@ -73,6 +73,16 @@ void feed_gaussian_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
     filter_kernel[8].x = 1.0f / 16;
 }
 
+void feed_identity_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
+    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+        filter_kernel[i].x = 0.0;
+        filter_kernel[i].y = 0.0;
+        if (i == FILTER_KERNEL_SIZE / 2) {
+            filter_kernel[i].x = 1.0;
+        }
+    }
+}
+
 int main(int argc, char **argv) {
 
     // load image
@@ -100,7 +110,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_gaussian_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
@@ -164,7 +174,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("image/original_sheep.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("image/filtered_identity_sheep.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
