@@ -27,8 +27,10 @@ __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
         cufftComplex c;
         c.x = a[i].x * b[i].x - a[i].y*b[i].y;
         c.y = a[i].x * b[i].y + a[i].y*b[i].x;
+        printf("%5.3f %5.3f", c.x, c.y);
         c.x /= (1.0f / size);
         c.y /= (1.0f / size);
+        printf("%5.3f %5.3f", c.x, c.y);
         a[i] = c;
     }
 }
@@ -116,13 +118,6 @@ int main(int argc, char **argv) {
     // perform 2dfft
     cufftExecC2C(plan, dev_signal, dev_signal, CUFFT_FORWARD);
     cufftExecC2C(plan, dev_filter_kernel, dev_filter_kernel, CUFFT_FORWARD);
-
-    // show results
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("IFFT SIGNAL DATA: %3.1f %3.1f \n", dev_signal[i * 4 + j].x, dev_signal[i * 4 + j].y);
-        }
-    }
 
     // perform multiplication
     ComplexMul <<<32, 256>>>(dev_signal, dev_filter_kernel, new_size);
