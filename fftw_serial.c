@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
     fftw_free(signal);
     fftw_free(filter_kernel);
     fftw_free(padded_signal);
-    fftw_free(padded_filter_kernel);s
+    fftw_free(padded_filter_kernel);
 
     return 0;
 }
