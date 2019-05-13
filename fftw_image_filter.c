@@ -150,9 +150,13 @@ void Convolve(fftw_complex *signal, int signal_height, int signal_width,
                     int row = i + r;
                     int col = j + c;
                     if (row < 0 || row >= signal_height || col < 0 || col >= signal_width) continue;
-                    filtered_signal[i * signal_width + j] = SingleComplexAdd(filtered_signal[i * signal_width + j], 
-                                        SingleComplexMul(signal[row * signal_width + col], 
-                                        filter_kernel[(minV - r) * filter_kernel_width + minH - c]));
+                    fftw_complex a, b;
+                    a[0] = signal[row * signal_width + col][0];
+                    a[1] = signal[row * signal_width + col][1];
+                    b[0] = filter_kernel[(minV - r) * filter_kernel_width + minH - c][0];
+                    b[1] = filter_kernel[(minV - r) * filter_kernel_width + minH - c][1];
+                    filtered_signal[i * signal_width + j][0] += (a[0] * b[0] - a[1] * b[1]);
+                    filtered_signal[i * signal_width + j][1] += (a[0] * b[1] + a[1] * b[0]);
                 }
             }
         }
