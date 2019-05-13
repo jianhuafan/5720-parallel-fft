@@ -193,8 +193,9 @@ void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {
             openmp_1d_fft(in + i * n, out + i * n, n, sign);
         }
         Complex *temp_out = (Complex*) malloc(sizeof(Complex)* m * n);
+        Complex *temp;
         for (i = 0; i < n; i++) {
-            Complex *temp = (Complex*) malloc(sizeof(Complex)* m);
+            temp = (Complex*) malloc(sizeof(Complex)* m);
             for (j = 0; j < m; j++) {
                 temp[j] = out[j * n + i];
             }
