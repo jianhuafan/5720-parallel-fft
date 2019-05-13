@@ -17,7 +17,7 @@
 #define BILLION 1000000000L
 
 void Convolve(fftw_complex *signal, int signal_height, int signal_width, 
-              fftw_complex *filter_kernel, int filter_kernel_height, filter_kernel_width,
+              fftw_complex *filter_kernel, int filter_kernel_height, int filter_kernel_width,
               fftw_complex *filtered_signal);
 
 // Pad data
@@ -117,20 +117,6 @@ void ComplexMul(fftw_complex *a, fftw_complex *b, int size) {
         a[i][0] = c[0];
         a[i][1] = c[1];
     }
-}
-
-fftw_complex SingleComplexMul(fftw_complex a, fftw_complex b) {
-  fftw_complex c;
-  c[0] = a[0] * b[0] - a[1] * b[1];
-  c[1] = a[0] * b[1] + a[1] * b[0];
-  return c;
-}
-
-fftw_complex SingleComplexAdd(fftw_complex a, fftw_complex b) {
-  fftw_complex c;
-  c[0] = a[0] + b[0];
-  c[1] = a[1] + b[1];
-  return c;
 }
 
 // Computes convolution on the host
