@@ -146,7 +146,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_sharpen_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     Complex *padded_signal;
@@ -160,6 +160,14 @@ int main(int argc, char **argv) {
     out_signal = (Complex*) malloc(sizeof(Complex)* new_size);
     out_filter_kernel = (Complex*) malloc(sizeof(Complex)* new_size);
 
+    // print result
+    printf("padded_signal\n");
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j].a, padded_signal[i * 4 + j].b);
+        }
+    }
+
     // convolution starts
     struct timespec start, end;
     long long unsigned int diff;
@@ -169,8 +177,24 @@ int main(int argc, char **argv) {
     openmp_2d_fft(padded_signal, out_signal, height, width, FFT_FORWARD);
     openmp_2d_fft(padded_filter_kernel, out_filter_kernel, height, width, FFT_FORWARD);
 
+    // print result
+    printf("out_signal\n");
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j].a, out_signal[i * 4 + j].b);
+        }
+    }
+
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
+
+    // print result
+    printf("out_signal\n");
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j].a, out_signal[i * 4 + j].b);
+        }
+    }
 
     // perform inverse fft
     openmp_2d_fft(out_signal, padded_signal, height, width, FFT_BACKWARD);
@@ -199,7 +223,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("output/self/filtered_identity_sheep.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/self/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }

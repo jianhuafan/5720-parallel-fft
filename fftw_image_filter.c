@@ -151,6 +151,14 @@ int main(int argc, char **argv) {
     out_signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
     out_filter_kernel = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
 
+    // print result
+    printf("padded_signal\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
+        }
+    }
+
     // convolution starts
     struct timespec start, end;
     long long unsigned int diff;
@@ -166,8 +174,24 @@ int main(int argc, char **argv) {
     fftw_execute(signal_plan);
     fftw_execute(kernel_plan);
 
+    // print result
+    printf("out_signal\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
+        }
+    }
+
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
+
+    // print result
+    printf("out_signal\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
+        }
+    }
 
     // perform inverse fft
     fftw_plan inverse_signal_plan;
