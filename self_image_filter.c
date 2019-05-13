@@ -116,7 +116,7 @@ void ComplexMul(Complex *c1, Complex *c2, int size) {
         c.a /= (double)size;
         c.b /= (double)size;
         c1[i].a = c.a;
-        c2[i].b = c.b;
+        c1[i].b = c.b;
     }
 }
 
