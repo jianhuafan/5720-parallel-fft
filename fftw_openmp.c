@@ -167,7 +167,7 @@ int main(int argc, char **argv) {
     printf("padded_signal\n");
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
+            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
         }
     }
 
@@ -193,7 +193,7 @@ int main(int argc, char **argv) {
     printf("padded_signal\n");
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
+            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
         }
     }
 
