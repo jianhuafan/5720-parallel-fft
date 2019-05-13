@@ -42,7 +42,8 @@ int PadData(const Complex *signal, Complex **padded_signal, int signal_size,
 }
 
 void feed_gaussian_kernel(Complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    int i;
+    for (i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].a = 0.0;
         filter_kernel[i].b = 0.0;
     }
@@ -58,7 +59,8 @@ void feed_gaussian_kernel(Complex *filter_kernel, int filter_kernel_size) {
 }
 
 void feed_identity_kernel(Complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    int i;
+    for (i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].a = 0.0;
         filter_kernel[i].b = 0.0;
         if (i == FILTER_KERNEL_SIZE / 2) {
@@ -68,7 +70,8 @@ void feed_identity_kernel(Complex *filter_kernel, int filter_kernel_size) {
 }
 
 void feed_edge_detection_kernel(Complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    int i;
+    for (i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].a = 0.0;
         filter_kernel[i].b = 0.0;
     }
@@ -84,14 +87,16 @@ void feed_edge_detection_kernel(Complex *filter_kernel, int filter_kernel_size) 
 }
 
 void feed_box_blur_kernel(Complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    int i;
+    for (i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].a = 1.0 / filter_kernel_size;
         filter_kernel[i].b = 0.0;
     }
 }
 
 void feed_sharpen_kernel(Complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    int i;
+    for (i = 0; i < FILTER_KERNEL_SIZE; i++) {
         filter_kernel[i].a = 0.0;
         filter_kernel[i].b = 0.0;
     }
@@ -103,7 +108,8 @@ void feed_sharpen_kernel(Complex *filter_kernel, int filter_kernel_size) {
 }
 
 void ComplexMul(Complex *a, Complex *b, int size) {
-    for (int i = 0; i < size; i++) {
+    int i;
+    for (i = 0; i < size; i++) {
         Complex c;
         c.a = a[i].a * b[i].a - a[i].b*b[i].b;
         c.b = a[i].a * b[i].b + a[i].b*b[i].a;
