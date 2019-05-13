@@ -189,20 +189,20 @@ void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {
     for (i = 0; i < m; i++) {
         openmp_1d_fft(in + i * n, out + i * n, n, sign);
     }
-    Complex *temp_out = (Complex*) malloc(sizeof(Complex)* m * n);
-    Complex *temp;
-    for (i = 0; i < n; i++) {
-        temp = (Complex*) malloc(sizeof(Complex)* m);
-        for (j = 0; j < m; j++) {
-            temp[j].a = out[j * n + i].a;
-            temp[j].b = out[j * n + i].b;
-        }
-        openmp_1d_fft(temp, temp_out + i * m, m, sign);
-    }
+    Complex *transposed = (Complex*) malloc(sizeof(Complex)* m * n);
     for (i = 0; i < m; i++) {
         for (j = 0; j < n; j++) {
-            out[i * n + j].a = temp_out[j * m + i].a;
-            out[i * n + j].b = temp_out[j * m + i].b;
+            transposed[i * n + j].a = out[j * n + i].a;
+            transposed[i * n + j].b = out[j * n + i].b;
+        }
+    }
+    Complex *temp;
+    for (j = 0; j < n; j++) {
+        temp = (Complex*) malloc(sizeof(Complex)* m);
+        openmp_1d_fft(transposed + j * m, temp, m, sign);
+        for (i = 0; i < m; i++) {
+            out[i * n + j].a = temp[i].a;
+            out[i * n + j].b = temp[i].b;
         }
     }
 }
