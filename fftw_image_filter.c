@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
     output_grey_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            output_grey_image[i * width + j] = (uint8_t)filtered_signal[i * width + j][0];
+            output_grey_image[i * width + j] = (uint8_t)padded_signal[i * width + j][0];
             if (i < 4 && j < 4) {
                 printf("%hhu\n", output_grey_image[i * width + j]);
             }
