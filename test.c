@@ -17,7 +17,7 @@ int main() {
 
     // load image
     int width, height, bpp;
-    uint8_t* grey_image = stbi_load("input/sheep.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* grey_image = stbi_load("input/128.png", &width, &height, &bpp, STBI_grey);
     printf("input image, width: %d, height: %d\n", width, height);
 
     // feed input
