@@ -184,9 +184,9 @@ int main(int argc, char **argv) {
 
      // print result
     printf("out_filter_kernel\n");
-    for (i = 0; i < 4; i++) {
-        for (j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", out_filter_kernel[i * 4 + j][0], out_filter_kernel[i * 4 + j][0]);
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_filter_kernel[i * 4 + j][0], out_filter_kernel[i * 4 + j][1]);
         }
     }
 
