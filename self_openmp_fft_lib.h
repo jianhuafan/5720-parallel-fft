@@ -184,7 +184,8 @@ void openmp_1d_fft(Complex *in, Complex *out, int n, int sign) {
     }
     if (sign == FFT_BACKWARD) {
         for (i = 0; i < n; i++) {
-            out[i] /= n;
+            out[i].a /= n;
+            out[i].b /= n;
         }
     }
 }
