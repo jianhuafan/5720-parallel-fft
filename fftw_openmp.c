@@ -135,14 +135,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    // print result
-    printf("signal\n");
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", signal[i * 4 + j][0], signal[i * 4 + j][1]);
-        }
-    }
-
     // feed kernel
     feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
@@ -163,14 +155,6 @@ int main(int argc, char **argv) {
     long long unsigned int diff;
     clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
 
-    // print result
-    printf("padded_signal\n");
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
-        }
-    }
-
     // create plan
     fftw_plan signal_plan;
     fftw_plan kernel_plan;
@@ -181,28 +165,13 @@ int main(int argc, char **argv) {
     fftw_execute(signal_plan);
     fftw_execute(kernel_plan);
 
-    // print result
-    printf("out_signal\n");
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
-        }
-    }
-
-    // print result
-    printf("padded_signal\n");
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
-        }
-    }
-
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
 
     // perform inverse fft
     fftw_plan inverse_signal_plan;
     inverse_signal_plan = fftw_plan_dft_2d(height, width, out_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
+    fftw_execute(inverse_signal_plan);
 
     // convolution ends
     clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
