@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
     // load image
     int width, height, bpp;
-    uint8_t* rgb_image = stbi_load("input/128.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* rgb_image = stbi_load("input/2048.png", &width, &height, &bpp, STBI_grey);
 
     float elapsedTime = 0;
     cufftHandle plan;
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("output/cuda/filtered_gaussian_128.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("output/cuda/filtered_gaussian_2048.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
