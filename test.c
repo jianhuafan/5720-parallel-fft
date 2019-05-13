@@ -19,9 +19,9 @@ int main() {
     self_input = (Complex*) malloc(sizeof(Complex)* N*N);
     srand(time(NULL));
     for (int i = 0; i < N * N; i++) {
-        fftw_input[i][0] = (float)i;
+        fftw_input[i][0] = rand();
         fftw_input[i][1] = 0.0;
-        self_input[i].a = (float)i;
+        self_input[i].a = fftw_input[i][0];
         self_input[i].b = 0.0;
     }
 
@@ -47,5 +47,19 @@ int main() {
         printf("DATA: %3.1f %3.1f\n", self_output[i].a, self_output[i].b);
     }
 
+    int wrong_result = 0;
+    for (int i = 0; i < N*N; i++) {
+        if (abs(fftw_output[i][0] - self_output[i].a) > 1e-5) {
+            wrong_result = 1;
+            break;
+        }
+        if (abs(fftw_output[i][1] - self_output[i].b) > 1e-5) {
+            wrong_result = 1;
+            break;
+        }
+    }
+    if (wrong_result) {
+        printf("wrong result!!!!!!!!\n");
+    }
     return 0;
 }
