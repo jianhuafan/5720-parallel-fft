@@ -171,7 +171,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_sharpen_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_gaussian_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     fftw_complex *padded_signal;
@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("output/fftw/convolve_filtered_sharpen_256.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/fftw/convolve_filtered_gaussian_256.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
