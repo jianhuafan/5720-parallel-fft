@@ -152,7 +152,7 @@ void Convolve(fftw_complex *signal, int signal_height, int signal_width,
 int main(int argc, char **argv) {
     // load image
     int width, height, bpp;
-    uint8_t* grey_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* grey_image = stbi_load("input/2048.png", &width, &height, &bpp, STBI_grey);
     printf("input image, width: %d, height: %d\n", width, height);
 
     fftw_complex *signal;
@@ -237,7 +237,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("output/fftw/convolve_filtered_gaussian_256.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/fftw/convolve_filtered_gaussian_2048.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
