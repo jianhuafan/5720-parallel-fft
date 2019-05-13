@@ -131,7 +131,6 @@ int main(int argc, char **argv) {
         for (int j = 0; j < width; j++) {
             uint8_t* pixel = grey_image + (i * width + j);
             signal[i * width + j][0] = (double)pixel[0];
-            printf("%f\n", (double)pixel[0]);
             signal[i * width + j][1] = 0.0;
         }
     }
@@ -145,6 +144,12 @@ int main(int argc, char **argv) {
     int new_size = PadData(signal, &padded_signal, width * height, filter_kernel,
               &padded_filter_kernel, FILTER_KERNEL_SIZE);
 
+    //have output buffer
+    fftw_complex *out_signal;
+    fftw_complex *out_filter_kernel;
+    out_signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
+    out_filter_kernel = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
+
     // convolution starts
     struct timespec start, end;
     long long unsigned int diff;
@@ -153,19 +158,19 @@ int main(int argc, char **argv) {
     // create plan
     fftw_plan signal_plan;
     fftw_plan kernel_plan;
-    signal_plan = fftw_plan_dft_2d(height, width, padded_signal, padded_signal, FFTW_FORWARD, FFTW_ESTIMATE);
-    kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, padded_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
+    signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
+    kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
 
     // perform 2d fft
     fftw_execute(signal_plan);
     fftw_execute(kernel_plan);
 
     // perform multiplication
-    ComplexMul(padded_signal, padded_filter_kernel, new_size);
+    ComplexMul(out_signal, out_filter_kernel, new_size);
 
     // perform inverse fft
     fftw_plan inverse_signal_plan;
-    inverse_signal_plan = fftw_plan_dft_2d(height, width, padded_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
+    inverse_signal_plan = fftw_plan_dft_2d(height, width, out_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
 
     // convolution ends
     clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
