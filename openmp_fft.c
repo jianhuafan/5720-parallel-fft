@@ -248,8 +248,8 @@ int main(int argc, char *argv[]) {
     }
     clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
     diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("elapsed time = %llu us\n", (long long unsigned int) (diff / 1000));
-    // for (i = 0; i < n; i++) {
-    //     comp_print(out[i]);
-    // }
+    for (i = 0; i < n; i++) {
+        comp_print(out[i]);
+    }
+    printf("elapsed time = %llu us\n", (long long unsigned int) (diff / 1000));
 }
