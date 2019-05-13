@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
     // load image
     int width, height, bpp;
-    uint8_t* rgb_image = stbi_load("input/2048.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* rgb_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
 
     float elapsedTime = 0;
     cufftHandle plan;
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_gaussian_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("output/cuda/filtered_gaussian_2048.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("output/cuda/filtered_identity_256.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
