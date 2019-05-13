@@ -16,6 +16,10 @@
 #define FILTER_KERNEL_SIZE 9
 #define BILLION 1000000000L
 
+void Convolve(fftw_complex *signal, int signal_height, int signal_width, 
+              fftw_complex *filter_kernel, int filter_kernel_height, filter_kernel_width,
+              fftw_complex *filtered_signal);
+
 // Pad data
 int PadData(const fftw_complex *signal, fftw_complex **padded_signal, int signal_size,
             const fftw_complex *filter_kernel, fftw_complex **padded_filter_kernel,
@@ -131,7 +135,7 @@ fftw_complex SingleComplexAdd(fftw_complex a, fftw_complex b) {
 
 // Computes convolution on the host
 void Convolve(fftw_complex *signal, int signal_height, int signal_width, 
-              fftw_complex *filter_kernel, int filter_kernel_height, filter_kernel_width,
+              fftw_complex *filter_kernel, int filter_kernel_height, int filter_kernel_width,
               fftw_complex *filtered_signal) {
     int minRadius = filter_kernel_size / 2;
     int maxRadius = filter_kernel_size - minRadius;
