@@ -185,6 +185,14 @@ int main(int argc, char **argv) {
         }
     }
 
+    // print result
+    printf("out_filter_kernel\n");
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_filter_kernel[i * 4 + j].a, out_filter_kernel[i * 4 + j].b);
+        }
+    }
+
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
 
