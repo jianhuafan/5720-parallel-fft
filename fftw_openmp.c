@@ -135,6 +135,14 @@ int main(int argc, char **argv) {
         }
     }
 
+    // print result
+    printf("signal\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", signal[i * 4 + j][0], signal[i * 4 + j][1]);
+        }
+    }
+
     // feed kernel
     feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
@@ -154,6 +162,14 @@ int main(int argc, char **argv) {
     struct timespec start, end;
     long long unsigned int diff;
     clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
+
+    // print result
+    printf("padded_signal\n");
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", out_signal[i * 4 + j][0], out_signal[i * 4 + j][1]);
+        }
+    }
 
     // create plan
     fftw_plan signal_plan;
@@ -212,7 +228,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("image/fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("image_fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
