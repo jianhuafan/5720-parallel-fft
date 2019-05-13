@@ -40,13 +40,13 @@ int main() {
     fftw_complex * fftw_output;
     fftw_output = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* height*width);
     fftw_plan my_plan;
-    my_plan = fftw_plan_dft_2d(height, width, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_ESTIMATE);
+    my_plan = fftw_plan_dft_1d(height * width, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(my_plan);
 
     // perform self 2d fft
     Complex *self_output;
     self_output = (Complex*) malloc(sizeof(Complex)* height*width);
-    openmp_2d_fft(self_input, self_output, height, width, FFT_BACKWARD);
+    openmp_1d_fft(self_input, self_output, height * width, FFT_BACKWARD);
 
     // compare result
     printf("=======fftw result=======\n");
