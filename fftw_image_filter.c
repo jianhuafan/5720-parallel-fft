@@ -154,7 +154,7 @@ int main(int argc, char **argv) {
     uint8_t* grey_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
     printf("input image, width: %d, height: %d\n", width, height);
 
-    int filter_kernel_height = 15;
+    int filter_kernel_height = 3;
     int filter_kernel_width = filter_kernel_height;
     int filter_kernel_size = filter_kernel_height * filter_kernel_width;
 
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_gaussian_kernel(filter_kernel, filter_kernel_size);
+    feed_identity_kernel(filter_kernel, filter_kernel_size);
 
     // pad image and filter kernel
     fftw_complex *padded_signal;
