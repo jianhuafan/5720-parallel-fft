@@ -121,10 +121,6 @@ void ComplexMul(Complex *c1, Complex *c2, int size) {
 }
 
 int main(int argc, char **argv) {
-
-    // set threads
-    omp_set_num_threads(8);
-
     // load image
     int width, height, bpp;
     uint8_t* grey_image = stbi_load("input/sheep.png", &width, &height, &bpp, STBI_grey);
