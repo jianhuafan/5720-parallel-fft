@@ -137,9 +137,6 @@ fftw_complex SingleComplexAdd(fftw_complex a, fftw_complex b) {
 void Convolve(fftw_complex *signal, int signal_height, int signal_width, 
               fftw_complex *filter_kernel, int filter_kernel_height, int filter_kernel_width,
               fftw_complex *filtered_signal) {
-    int minRadius = filter_kernel_size / 2;
-    int maxRadius = filter_kernel_size - minRadius;
-
     int minH = filter_kernel_height / 2;
     int maxH = filter_kernel_height - minH;
     int minV = filter_kernel_width / 2;
