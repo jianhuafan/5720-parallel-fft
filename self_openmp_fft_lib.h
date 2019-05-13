@@ -182,6 +182,11 @@ void openmp_1d_fft(Complex *in, Complex *out, int n, int sign) {
         step = step * 2;
         a = a / 2;
     }
+    if (sign == FFT_BACKWARD) {
+        for (i = 0; i < n; i++) {
+            out[i] /= n;
+        }
+    }
 }
 
 void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {

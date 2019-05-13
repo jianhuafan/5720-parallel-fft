@@ -29,13 +29,13 @@ int main() {
     fftw_complex * fftw_output;
     fftw_output = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* N*N);
     fftw_plan my_plan;
-    my_plan = fftw_plan_dft_2d(N, N, fftw_input, fftw_output, FFTW_FORWARD, FFTW_ESTIMATE);
+    my_plan = fftw_plan_dft_2d(N, N, fftw_input, fftw_output, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(my_plan);
 
     // perform self 2d fft
     Complex *self_output;
     self_output = (Complex*) malloc(sizeof(Complex)* N*N);
-    openmp_2d_fft(self_input, self_output, N, N, FFT_FORWARD);
+    openmp_2d_fft(self_input, self_output, N, N, FFT_BACKWARD);
 
     // compare result
     printf("=======fftw result=======\n");
