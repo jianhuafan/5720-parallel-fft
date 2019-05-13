@@ -107,16 +107,16 @@ void feed_sharpen_kernel(Complex *filter_kernel, int filter_kernel_size) {
     filter_kernel[7].a = -1.0f;
 }
 
-void ComplexMul(Complex *a, Complex *b, int size) {
+void ComplexMul(Complex *c1, Complex *c2, int size) {
     int i;
     for (i = 0; i < size; i++) {
         Complex c;
-        c.a = a[i].a * b[i].a - a[i].b*b[i].b;
-        c.b = a[i].a * b[i].b + a[i].b*b[i].a;
-        c.a /= size;
-        c.b /= size;
-        a[i].a = c.a;
-        a[i].b = c.b;
+        c.a = c1[i].a * c2[i].a - c1[i].b*c2[i].b;
+        c.b = c1[i].a * c2[i].b + c1[i].b*c2[i].a;
+        c.a /= (double)size;
+        c.b /= (double)size;
+        c1[i].a = c.a;
+        c2[i].b = c.b;
     }
 }
 
