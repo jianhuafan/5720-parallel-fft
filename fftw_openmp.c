@@ -172,8 +172,15 @@ int main(int argc, char **argv) {
     kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
 
     // perform 2d fft
-    fftw_execute(signal_plan);
-    fftw_execute(kernel_plan);
+    #pragma omp parallel
+    {
+        int tid = omp_get_thread_num();
+        if (tid == 0) {
+            fftw_execute(signal_plan);
+        } else {
+            fftw_execute(kernel_plan);
+        }
+    }
 
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
