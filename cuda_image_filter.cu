@@ -16,8 +16,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define FILTER_KERNEL_SIZE 9
-
 __global__ void ComplexMul(cufftComplex *a, cufftComplex *b, int size) {
     const int numThreads = blockDim.x * gridDim.x;
     const int threadID = blockIdx.x * blockDim.x + threadIdx.x;
@@ -58,7 +56,7 @@ int PadData(const cufftComplex *signal, cufftComplex **padded_signal, int signal
 }
 
 void feed_gaussian_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i].x = 0.0;
         filter_kernel[i].y = 0.0;
     }
@@ -74,17 +72,17 @@ void feed_gaussian_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
 }
 
 void feed_identity_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i].x = 0.0;
         filter_kernel[i].y = 0.0;
-        if (i == FILTER_KERNEL_SIZE / 2) {
+        if (i == filter_kernel_size / 2) {
             filter_kernel[i].x = 1.0;
         }
     }
 }
 
 void feed_edge_detection_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i].x = 0.0;
         filter_kernel[i].y = 0.0;
     }
@@ -100,14 +98,14 @@ void feed_edge_detection_kernel(cufftComplex *filter_kernel, int filter_kernel_s
 }
 
 void feed_box_blur_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i].x = 1.0 / filter_kernel_size;
         filter_kernel[i].y = 0.0;
     }
 }
 
 void feed_sharpen_kernel(cufftComplex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i].x = 0.0;
         filter_kernel[i].y = 0.0;
     }
@@ -124,12 +122,14 @@ int main(int argc, char **argv) {
     int width, height, bpp;
     uint8_t* rgb_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
 
+    int filter_kernel_size = 15 * 15;
+
     float elapsedTime = 0;
     cufftHandle plan;
     int signal_size = width * height * sizeof(cufftComplex);
 
     cufftComplex *signal = (cufftComplex*)malloc(signal_size);
-    cufftComplex *filter_kernel = (cufftComplex*)malloc(FILTER_KERNEL_SIZE * sizeof(cufftComplex));
+    cufftComplex *filter_kernel = (cufftComplex*)malloc(filter_kernel_size * sizeof(cufftComplex));
     cufftComplex *dev_signal;
     cufftComplex *dev_filter_kernel;
     cudaEvent_t start, stop;
@@ -145,13 +145,13 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_sharpen_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_identity_kernel(filter_kernel, filter_kernel_size);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
     cufftComplex *padded_filter_kernel;
     int new_size = PadData(signal, &padded_signal, width * height, filter_kernel,
-              &padded_filter_kernel, FILTER_KERNEL_SIZE);
+              &padded_filter_kernel, filter_kernel_size);
     
     int mem_size = sizeof(cufftComplex) * new_size;
 
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("output/cuda/filtered_sharpen_256.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("output/cuda/filtered_identity_256.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
