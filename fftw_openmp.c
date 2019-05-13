@@ -197,7 +197,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("image_fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("image/fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
