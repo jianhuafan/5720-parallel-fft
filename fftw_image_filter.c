@@ -137,7 +137,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_edge_detection_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_box_blur_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     fftw_complex *padded_signal;
@@ -198,7 +198,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("output/fftw/filtered_edge_256.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/fftw/filtered_boxblur_256.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
