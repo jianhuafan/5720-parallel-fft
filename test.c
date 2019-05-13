@@ -29,9 +29,9 @@ int main() {
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             uint8_t* pixel = grey_image + (i * width + j);
-            self_input[i * width + j].a = ((double)pixel[0]) / 100;
+            self_input[i * width + j].a = ((double)pixel[0]) / 1000;
             self_input[i * width + j].b = 0.0;
-            fftw_input[i * width + j][0] = (double)pixel[0] / 100;
+            fftw_input[i * width + j][0] = (double)pixel[0] / 1000;
             fftw_input[i * width + j][1] = 0.0;
         }
     }
