@@ -115,6 +115,49 @@ void ComplexMul(fftw_complex *a, fftw_complex *b, int size) {
     }
 }
 
+void fftw_complex SingleComplexMul(fftw_complex a, fftw_complex b) {
+  fftw_complex c;
+  c[0] = a[0] * b[0] - a[1] * b[1];
+  c[1] = a[0] * b[1] + a[1] * b[0];
+  return c;
+}
+
+void fftw_complex SingleComplexAdd(fftw_complex a, fftw_complex b) {
+  fftw_complex c;
+  c[0] = a[0] + b[0];
+  c[1] = a[1] + b[1];
+  return c;
+}
+
+// Computes convolution on the host
+void Convolve(cufftComplex *signal, int signal_height, int signal_width, 
+              cufftComplex *filter_kernel, int filter_kernel_height, filter_kernel_width,
+              cufftComplex *filtered_signal) {
+    int minRadius = filter_kernel_size / 2;
+    int maxRadius = filter_kernel_size - minRadius;
+
+    int minH = filter_kernel_height / 2;
+    int maxH = filter_kernel_height - minH;
+    int minV = filter_kernel_width / 2;
+    int maxV = filter_kernel_width - minV;
+
+    for (int i = 0; i < signal_height; i++) {
+        for (int j = 0; j < signal_width; j++) {
+            filtered_signal[i * signal_width + j][0] = filtered_signal[i * signal_width + j][1] = 0;
+            for (int r = -maxV + 1; r <= minV; r++) {
+                for (int c = -maxH + 1; c <= minH; c++) {
+                    int row = i + r;
+                    int col = j + c;
+                    if (row < 0 || row >= signal_height || col < 0 || col >= signal_width) continue;
+                    filtered_signal[i * signal_width + j] = SingleComplexAdd(filtered_signal[i * signal_width + j], 
+                                        SingleComplexMul(signal[row * signal_width + col], 
+                                        filter_kernel[(minV - r) * filter_kernel_width + minH - c]));
+                }
+            }
+        }
+    }
+}
+
 int main(int argc, char **argv) {
     // load image
     int width, height, bpp;
@@ -156,23 +199,28 @@ int main(int argc, char **argv) {
     long long unsigned int diff;
     clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
 
-    // create plan
-    fftw_plan signal_plan;
-    fftw_plan kernel_plan;
-    signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
-    kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
+    // // create plan
+    // fftw_plan signal_plan;
+    // fftw_plan kernel_plan;
+    // signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
+    // kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
 
-    // perform 2d fft
-    fftw_execute(signal_plan);
-    fftw_execute(kernel_plan);
+    // // perform 2d fft
+    // fftw_execute(signal_plan);
+    // fftw_execute(kernel_plan);
 
-    // perform multiplication
-    ComplexMul(out_signal, out_filter_kernel, new_size);
+    // // perform multiplication
+    // ComplexMul(out_signal, out_filter_kernel, new_size);
 
-    // perform inverse fft
-    fftw_plan inverse_signal_plan;
-    inverse_signal_plan = fftw_plan_dft_2d(height, width, out_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
-    fftw_execute(inverse_signal_plan);
+    // // perform inverse fft
+    // fftw_plan inverse_signal_plan;
+    // inverse_signal_plan = fftw_plan_dft_2d(height, width, out_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
+    // fftw_execute(inverse_signal_plan);
+
+    // directly convolve
+    fftw_complex * filtered_signal;
+    filtered_signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* height * width);
+    Convolve(signal, height, width, filter_kernel, 3, 3, filtered_signal);
 
     // convolution ends
     clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
@@ -183,7 +231,7 @@ int main(int argc, char **argv) {
     printf("results\n");
     for (int i = 0; i < 4; i++) {
         for (int j = 0; j < 4; j++) {
-            printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j][0], padded_signal[i * 4 + j][1]);
+            printf("DATA: %3.1f %3.1f\n", filtered_signal[i * 4 + j][0], filtered_signal[i * 4 + j][1]);
         }
     }
 
@@ -192,20 +240,20 @@ int main(int argc, char **argv) {
     output_grey_image = (uint8_t*)malloc(width*height);
     for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            output_grey_image[i * width + j] = (uint8_t)padded_signal[i * width + j][0];
+            output_grey_image[i * width + j] = (uint8_t)filtered_signal[i * width + j][0];
             if (i < 4 && j < 4) {
                 printf("%hhu\n", output_grey_image[i * width + j]);
             }
         }
     }
-    int result = stbi_write_png("output/fftw/filtered_sharpen_256.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/fftw/convolve_filtered_sharpen_256.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
 
     // free memory
-    fftw_destroy_plan(signal_plan);
-    fftw_destroy_plan(kernel_plan);
+    // fftw_destroy_plan(signal_plan);
+    // fftw_destroy_plan(kernel_plan);
     fftw_free(signal);
     fftw_free(filter_kernel);
     fftw_free(padded_signal);
