@@ -131,6 +131,7 @@ int main(int argc, char **argv) {
         for (int j = 0; j < width; j++) {
             uint8_t* pixel = grey_image + (i * width + j);
             signal[i * width + j][0] = (double)pixel[0];
+            printf("%f\n", (double)pixel[0]);
             signal[i * width + j][1] = 0.0;
         }
     }
@@ -189,7 +190,10 @@ int main(int argc, char **argv) {
             }
         }
     }
-    stbi_write_png("image/fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("image/fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
+    if (!result) {
+        printf("error writing image!\n");
+    }
 
     // free memory
     fftw_destroy_plan(signal_plan);
