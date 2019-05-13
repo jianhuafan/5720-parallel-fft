@@ -13,7 +13,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-#define FILTER_KERNEL_SIZE 9
 #define BILLION 1000000000L
 
 void Convolve(fftw_complex *signal, int signal_height, int signal_width, 
@@ -47,7 +46,7 @@ int PadData(const fftw_complex *signal, fftw_complex **padded_signal, int signal
 }
 
 void feed_gaussian_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i][0] = 0.0;
         filter_kernel[i][1] = 0.0;
     }
@@ -63,17 +62,17 @@ void feed_gaussian_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
 }
 
 void feed_identity_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i][0] = 0.0;
         filter_kernel[i][1] = 0.0;
-        if (i == FILTER_KERNEL_SIZE / 2) {
+        if (i == filter_kernel_size / 2) {
             filter_kernel[i][0] = 1.0;
         }
     }
 }
 
 void feed_edge_detection_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i][0] = 0.0;
         filter_kernel[i][1] = 0.0;
     }
@@ -89,14 +88,14 @@ void feed_edge_detection_kernel(fftw_complex *filter_kernel, int filter_kernel_s
 }
 
 void feed_box_blur_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i][0] = 1.0 / filter_kernel_size;
         filter_kernel[i][1] = 0.0;
     }
 }
 
 void feed_sharpen_kernel(fftw_complex *filter_kernel, int filter_kernel_size) {
-    for (int i = 0; i < FILTER_KERNEL_SIZE; i++) {
+    for (int i = 0; i < filter_kernel_size; i++) {
         filter_kernel[i][0] = 0.0;
         filter_kernel[i][1] = 0.0;
     }
@@ -155,10 +154,12 @@ int main(int argc, char **argv) {
     uint8_t* grey_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
     printf("input image, width: %d, height: %d\n", width, height);
 
+    int filter_kernel_size = 7 * 7;
+
     fftw_complex *signal;
     fftw_complex *filter_kernel;
     signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* height * width);
-    filter_kernel = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* FILTER_KERNEL_SIZE);
+    filter_kernel = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* filter_kernel_size);
 
     // feed input
     srand(time(NULL));
@@ -171,13 +172,13 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_gaussian_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_gaussian_kernel(filter_kernel, filter_kernel_size);
 
     // pad image and filter kernel
     fftw_complex *padded_signal;
     fftw_complex *padded_filter_kernel;
     int new_size = PadData(signal, &padded_signal, width * height, filter_kernel,
-              &padded_filter_kernel, FILTER_KERNEL_SIZE);
+              &padded_filter_kernel, filter_kernel_size);
 
     //have output buffer
     fftw_complex *out_signal;
