@@ -186,25 +186,23 @@ void openmp_1d_fft(Complex *in, Complex *out, int n, int sign) {
 
 void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {
     int i, j;
-    #pragma omp parallel
-    {
-        #pragma omp for private(i, j)
-        for (i = 0; i < m; i++) {
-            openmp_1d_fft(in + i * n, out + i * n, n, sign);
+    for (i = 0; i < m; i++) {
+        openmp_1d_fft(in + i * n, out + i * n, n, sign);
+    }
+    Complex *temp_out = (Complex*) malloc(sizeof(Complex)* m * n);
+    Complex *temp;
+    for (i = 0; i < n; i++) {
+        temp = (Complex*) malloc(sizeof(Complex)* m);
+        for (j = 0; j < m; j++) {
+            temp[j].a = out[j * n + i].a;
+            temp[j].b = out[j * n + i].b;
         }
-        Complex *temp_out = (Complex*) malloc(sizeof(Complex)* m * n);
-        Complex *temp;
-        for (i = 0; i < n; i++) {
-            temp = (Complex*) malloc(sizeof(Complex)* m);
-            for (j = 0; j < m; j++) {
-                temp[j] = out[j * n + i];
-            }
-            openmp_1d_fft(temp, temp_out + i * m, m, sign);
-        }
-        for (i = 0; i < m; i++) {
-            for (j = 0; j < n; j++) {
-                out[i * n + j] = temp_out[j * m + i];
-            }
+        openmp_1d_fft(temp, temp_out + i * m, m, sign);
+    }
+    for (i = 0; i < m; i++) {
+        for (j = 0; j < n; j++) {
+            out[i * n + j].a = temp_out[j * m + i].a;
+            out[i * n + j].b = temp_out[j * m + i].b;
         }
     }
 }
