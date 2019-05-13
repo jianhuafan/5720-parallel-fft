@@ -128,6 +128,7 @@ int main(int argc, char **argv) {
     // load image
     int width, height, bpp;
     uint8_t* grey_image = stbi_load("input/sheep.png", &width, &height, &bpp, STBI_grey);
+    printf("input image, width: %d, height: %d\n", width, height);
 
     Complex *signal;
     Complex *filter_kernel;
@@ -165,6 +166,14 @@ int main(int argc, char **argv) {
     for (i = 0; i < 4; i++) {
         for (j = 0; j < 4; j++) {
             printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j].a, padded_signal[i * 4 + j].b);
+        }
+    }
+
+    // print result
+    printf("padded_filter_kernel\n");
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            printf("DATA: %3.1f %3.1f\n", padded_filter_kernel[i * 4 + j].a, padded_filter_kernel[i * 4 + j].b);
         }
     }
 
