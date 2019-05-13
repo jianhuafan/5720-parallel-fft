@@ -153,12 +153,6 @@ int main(int argc, char **argv) {
     int new_size = PadData(signal, &padded_signal, width * height, filter_kernel,
               &padded_filter_kernel, FILTER_KERNEL_SIZE);
 
-    //have output buffer
-    fftw_complex *out_signal;
-    fftw_complex *out_filter_kernel;
-    out_signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
-    out_filter_kernel = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* new_size);
-
     // convolution starts
     struct timespec start, end;
     long long unsigned int diff;
@@ -178,20 +172,20 @@ int main(int argc, char **argv) {
     {
         int tid = omp_get_thread_num();
         if (tid == 0) {
-            signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
+            signal_plan = fftw_plan_dft_2d(height, width, padded_signal, padded_signal, FFTW_FORWARD, FFTW_ESTIMATE);
             fftw_execute(signal_plan);
         } else {
-            kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
+            kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, padded_signal, FFTW_FORWARD, FFTW_ESTIMATE);
             fftw_execute(kernel_plan);
         }
     }
 
     // perform multiplication
-    ComplexMul(out_signal, out_filter_kernel, new_size);
+    ComplexMul(padded_signal, padded_signal, new_size);
 
     // perform inverse fft
     fftw_plan inverse_signal_plan;
-    inverse_signal_plan = fftw_plan_dft_2d(height, width, out_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
+    inverse_signal_plan = fftw_plan_dft_2d(height, width, padded_signal, padded_signal, FFTW_BACKWARD, FFTW_ESTIMATE);
     fftw_execute(inverse_signal_plan);
 
     // convolution ends
