@@ -168,21 +168,23 @@ int main(int argc, char **argv) {
     fftw_plan_with_nthreads(omp_get_max_threads());
     fftw_plan signal_plan;
     fftw_plan kernel_plan;
-    signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
-    kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
+    // signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
+    // kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
 
     // perform 2d fft
-    fftw_execute(signal_plan);
-    fftw_execute(kernel_plan);
-    // #pragma omp parallel
-    // {
-    //     int tid = omp_get_thread_num();
-    //     if (tid == 0) {
-    //         fftw_execute(signal_plan);
-    //     } else {
-    //         fftw_execute(kernel_plan);
-    //     }
-    // }
+    // fftw_execute(signal_plan);
+    // fftw_execute(kernel_plan);
+    #pragma omp parallel
+    {
+        int tid = omp_get_thread_num();
+        if (tid == 0) {
+            signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
+            fftw_execute(signal_plan);
+        } else {
+            kernel_plan = fftw_plan_dft_2d(height, width, padded_filter_kernel, out_filter_kernel, FFTW_FORWARD, FFTW_ESTIMATE);
+            fftw_execute(kernel_plan);
+        }
+    }
 
     // perform multiplication
     ComplexMul(out_signal, out_filter_kernel, new_size);
