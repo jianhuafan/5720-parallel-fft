@@ -154,7 +154,9 @@ int main(int argc, char **argv) {
     uint8_t* grey_image = stbi_load("input/256.png", &width, &height, &bpp, STBI_grey);
     printf("input image, width: %d, height: %d\n", width, height);
 
-    int filter_kernel_size = 7 * 7;
+    int filter_kernel_height = 15;
+    int filter_kernel_width = filter_kernel_height;
+    int filter_kernel_size = filter_kernel_height * filter_kernel_width;
 
     fftw_complex *signal;
     fftw_complex *filter_kernel;
@@ -212,7 +214,7 @@ int main(int argc, char **argv) {
     // directly convolve
     fftw_complex * filtered_signal;
     filtered_signal = (fftw_complex*) fftw_malloc(sizeof(fftw_complex)* height * width);
-    Convolve(signal, height, width, filter_kernel, 3, 3, filtered_signal);
+    Convolve(signal, height, width, filter_kernel, filter_kernel_height, filter_kernel_width, filtered_signal);
 
     // convolution ends
     clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
