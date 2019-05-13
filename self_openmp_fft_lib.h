@@ -202,7 +202,7 @@ void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {
         }
         for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
-                out[i * n + j] = temp[j * m + i];
+                out[i * n + j] = temp_out[j * m + i];
             }
         }
     }
