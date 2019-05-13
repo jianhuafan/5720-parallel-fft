@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
     }
 
     // feed kernel
-    feed_identity_kernel(filter_kernel, FILTER_KERNEL_SIZE);
+    feed_edge_detection_kernel(filter_kernel, FILTER_KERNEL_SIZE);
 
     // pad image and filter kernel
     cufftComplex *padded_signal;
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("output/cuda/filtered_identity_256.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("output/cuda/filtered_edge_256.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);
