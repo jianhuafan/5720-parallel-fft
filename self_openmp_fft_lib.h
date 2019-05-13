@@ -188,18 +188,41 @@ void openmp_2d_fft(Complex *in, Complex *out, int m, int n, int sign) {
     int i, j;
     #pragma omp parallel
     {
-        #pragma omp for private(i, j)
+        #pragma omp for private(i, j) shared(m, n, in, out, sign)
         for (i = 0; i < m; i++) {
             openmp_1d_fft(in + i * n, out + i * n, n, sign);
         }
-        Complex* transposed_mat = (Complex *) malloc(sizeof(Complex) * m * n);
+    }
+    Complex* transposed_mat = (Complex *) malloc(sizeof(Complex) * m * n);
+    #pragma omp parallel
+    {
+        #pragma omp for private(i, j) shared(m, n, in, out, transposed_mat, sign)
         for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++) {
                 transposed_mat[j * n + i] = out[i * n + j];
             }
         }
+    }
+    #pragma omp parallel
+    {
+        #pragma omp for private(i, j) shared(m, n, in, out, transposed_mat, sign)
         for (i = 0; i < m; i++) {
             openmp_1d_fft(transposed_mat + i * n, out + i * n, n, sign);
+        }
+    }
+    #pragma omp parallel
+    {
+        #pragma omp for private(i, j) shared(m, n, in, out, transposed_mat, sign)
+        for (i = 0; i < m; i++) {
+            for (j = i + 1; j < n; j++) {
+                Complex tmp;
+                temp.a = out[i * n + j].a;
+                temp.b = out[i * n + j].b;
+                out[i * n + j].a = out[j * n + i].a;
+                out[i * n + j].b = out[j * n + i].b;
+                out[j * n + i].a = temp.a;
+                out[j * n + i].b = temp.b;
+            }
         }
     }
 }
