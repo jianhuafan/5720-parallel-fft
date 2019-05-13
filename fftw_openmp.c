@@ -110,7 +110,8 @@ void ComplexMul(fftw_complex *a, fftw_complex *b, int size) {
         c[1] = a[i][0] * b[i][1] + a[i][1]*b[i][0];
         c[0] /= size;
         c[1] /= size;
-        a[i] = c;
+        a[i][0] = c[0];
+        a[i][1] = c[1];
     }
 }
 
