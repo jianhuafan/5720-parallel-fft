@@ -38,12 +38,12 @@ int main() {
     openmp_1d_fft(self_input, self_output, N, FFT_FORWARD);
 
     // compare result
-    printf("=======fftw result=======");
-    for (i = 0; i < 4; i++) {
+    printf("=======fftw result=======\n");
+    for (int i = 0; i < 4; i++) {
         printf("DATA: %3.1f %3.1f\n", fftw_output[i][0], fftw_output[i][1]);
     }
-    printf("======self result=======")
-    for (i = 0; i < 4; i++) {
+    printf("======self result=======\n");
+    for (int i = 0; i < 4; i++) {
         printf("DATA: %3.1f %3.1f\n", self_output[i].a, self_output[i].b);
     }
 
