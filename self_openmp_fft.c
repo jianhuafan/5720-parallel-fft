@@ -116,6 +116,9 @@ void ComplexMul(Complex *a, Complex *b, int size) {
 
 int main(int argc, char **argv) {
 
+    // set threads
+    omp_set_num_threads(8);
+
     // load image
     int width, height, bpp;
     uint8_t* grey_image = stbi_load("image/sheep.png", &width, &height, &bpp, STBI_grey);
@@ -127,8 +130,9 @@ int main(int argc, char **argv) {
 
     // feed input
     srand(time(NULL));
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    int i, j;
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
             uint8_t* pixel = grey_image + (i * width + j);
             signal[i * width + j].a = (double)pixel[0];
             signal[i * width + j].b = 0.0;
@@ -172,8 +176,8 @@ int main(int argc, char **argv) {
 
     // print result
     printf("results\n");
-    for (int i = 0; i < 4; i++) {
-        for (int j = 0; j < 4; j++) {
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
             printf("DATA: %3.1f %3.1f\n", padded_signal[i * 4 + j].a, padded_signal[i * 4 + j].b);
         }
     }
@@ -181,8 +185,8 @@ int main(int argc, char **argv) {
     // write filtered image
     uint8_t* output_grey_image;
     output_grey_image = (uint8_t*)malloc(width*height);
-    for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
+    for (i = 0; i < height; i++) {
+        for (j = 0; j < width; j++) {
             output_grey_image[i * width + j] = (uint8_t)padded_signal[i * width + j].a;
             if (i < 4 && j < 4) {
                 printf("%hhu\n", output_grey_image[i * width + j]);
