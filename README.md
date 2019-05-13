@@ -1,16 +1,16 @@
 compile command
 
-compile cuda_fft.cu
+compile cuda_image_filter.cu
 ```
-$ /usr/local/cuda-10.0/bin/nvcc -arch=compute_35 cuda_fft.cu -lcublas -lcufft
-```
-
-compile self_openmpfft.c
-```
-$ cc self_openmp_fft.c -fopenmp -lm
+$ /usr/local/cuda-10.0/bin/nvcc -arch=compute_35 cuda_image_filter.cu -lcublas -lcufft
 ```
 
-compile fftw_serial.c
+compile self_image_filter.c
 ```
-$ gcc fftw_serial.c -fopenmp -lfftw3 -lm
+$ cc self_image_filter.c -fopenmp -lm
+```
+
+compile fftw_image_filter.c
+```
+$ gcc fftw_image_filter.c -fopenmp -lfftw3 -lm
 ```

@@ -122,7 +122,7 @@ int main(int argc, char **argv) {
 
     // load image
     int width, height, bpp;
-    uint8_t* rgb_image = stbi_load("image/sheep.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* rgb_image = stbi_load("input/sheep.png", &width, &height, &bpp, STBI_grey);
 
     float elapsedTime = 0;
     cufftHandle plan;
@@ -208,7 +208,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    stbi_write_png("image/filtered_sharpen_sheep.png", width, height, 1, output_rgb_image, width);
+    stbi_write_png("output/cuda/filtered_sharpen_sheep.png", width, height, 1, output_rgb_image, width);
 
     // free memory
     cufftDestroy(plan);

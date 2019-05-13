@@ -127,7 +127,7 @@ int main(int argc, char **argv) {
 
     // load image
     int width, height, bpp;
-    uint8_t* grey_image = stbi_load("image/sheep.png", &width, &height, &bpp, STBI_grey);
+    uint8_t* grey_image = stbi_load("input/sheep.png", &width, &height, &bpp, STBI_grey);
 
     Complex *signal;
     Complex *filter_kernel;
@@ -199,7 +199,7 @@ int main(int argc, char **argv) {
             }
         }
     }
-    int result = stbi_write_png("image/fftw/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
+    int result = stbi_write_png("output/self/filtered_sharpen_sheep.png", width, height, 1, output_grey_image, width);
     if (!result) {
         printf("error writing image!\n");
     }
