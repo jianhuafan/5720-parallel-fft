@@ -116,6 +116,15 @@ void ComplexMul(fftw_complex *a, fftw_complex *b, int size) {
 }
 
 int main(int argc, char **argv) {
+    if (argc != 2) {
+        return 0;
+    }
+    int nthreads = atoi(argv[1]);
+    omp_set_num_threads(nthreads);
+    if (!fftw_init_threads()) {
+        printf("error init fftw threads!\n");
+    }
+
     // load image
     int width, height, bpp;
     uint8_t* grey_image = stbi_load("image/sheep.png", &width, &height, &bpp, STBI_grey);
@@ -156,6 +165,7 @@ int main(int argc, char **argv) {
     clock_gettime(CLOCK_MONOTONIC, &start);	/* mark start time */
 
     // create plan
+    fftw_plan_with_nthreads(omp_get_max_threads());
     fftw_plan signal_plan;
     fftw_plan kernel_plan;
     signal_plan = fftw_plan_dft_2d(height, width, padded_signal, out_signal, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -209,6 +219,7 @@ int main(int argc, char **argv) {
     fftw_free(filter_kernel);
     fftw_free(padded_signal);
     fftw_free(padded_filter_kernel);
+    fftw_cleanup_threads();
 
     return 0;
 }
